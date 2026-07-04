@@ -1,1 +1,896 @@
 # telc-2-3.0-
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>telc Deutsch B2 — Futuristic Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Futuristic Dark Theme Variables */
+            --bg-color: #0b0f19;
+            --bg-gradient: radial-gradient(circle at top right, #1a233a, #0b0f19);
+            --panel-bg: rgba(16, 24, 39, 0.6);
+            --panel-border: rgba(0, 229, 255, 0.15);
+            --primary-glow: #00e5ff;
+            --primary-glow-dim: rgba(0, 229, 255, 0.2);
+            --accent-color: #ff0055;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            --success-color: #00ff88;
+            --wrong-color: #ff3366;
+            --glass-blur: blur(12px);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb { background: var(--primary-glow-dim); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary-glow); }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            background: var(--bg-gradient);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, .question-title {
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--text-main);
+            letter-spacing: 0.5px;
+        }
+
+        header {
+            background: rgba(11, 15, 25, 0.8);
+            backdrop-filter: var(--glass-blur);
+            border-bottom: 1px solid var(--panel-border);
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        header h1 {
+            margin: 0;
+            color: var(--primary-glow);
+            text-shadow: 0 0 15px var(--primary-glow-dim);
+            text-transform: uppercase;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        /* Glassmorphism Panels */
+        .glass-panel {
+            background: var(--panel-bg);
+            backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        #login-screen {
+            text-align: center;
+            padding: 60px 40px;
+            max-width: 500px;
+            margin: 50px auto;
+            animation: fadeIn 1s ease-out;
+        }
+
+        .form-group {
+            margin: 25px 0;
+        }
+
+        input[type="text"] {
+            background: rgba(0, 0, 0, 0.4);
+            color: var(--primary-glow);
+            border: 1px solid var(--panel-border);
+            padding: 15px 20px;
+            width: 80%;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Space Grotesk', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary-glow);
+            box-shadow: 0 0 15px var(--primary-glow-dim);
+            transform: scale(1.02);
+        }
+
+        button {
+            background: transparent;
+            color: var(--primary-glow);
+            border: 1px solid var(--primary-glow);
+            padding: 12px 25px;
+            font-size: 16px;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 600;
+            text-transform: uppercase;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            background: var(--primary-glow);
+            color: #000;
+            box-shadow: 0 0 20px var(--primary-glow);
+            transform: translateY(-2px);
+        }
+
+        #main-interface {
+            display: none;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        .user-info {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 25px;
+            margin-bottom: 30px;
+            border-left: 4px solid var(--primary-glow);
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .tab-button {
+            padding: 12px 20px;
+            border: 1px solid var(--panel-border);
+            background: rgba(255, 255, 255, 0.03);
+            color: var(--text-muted);
+            border-radius: 8px;
+            letter-spacing: 1px;
+        }
+
+        .tab-button.active {
+            background: var(--primary-glow-dim);
+            color: var(--primary-glow);
+            border-color: var(--primary-glow);
+            box-shadow: inset 0 0 15px rgba(0, 229, 255, 0.1);
+        }
+
+        .tab-content {
+            display: none;
+            animation: slideUpFade 0.4s ease-out;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .module-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 30px;
+            margin-top: 15px;
+        }
+
+        @media (max-width: 900px) {
+            .module-layout { grid-template-columns: 1fr; }
+        }
+
+        .text-panel, .task-panel {
+            padding: 25px;
+            max-height: 700px;
+            overflow-y: auto;
+            border-radius: 12px;
+        }
+
+        .text-panel {
+            background: rgba(16, 24, 39, 0.4);
+            border: 1px solid var(--panel-border);
+        }
+
+        .task-panel {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .question-block {
+            background: rgba(255, 255, 255, 0.03);
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .question-block:hover {
+            border-color: var(--primary-glow-dim);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .question-title {
+            color: var(--primary-glow);
+            margin-bottom: 12px;
+            font-size: 1.1em;
+        }
+
+        .options-flex {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .options-flex label {
+            cursor: pointer;
+            padding: 8px 12px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 6px;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+        }
+
+        .options-flex label:hover {
+            border-color: var(--primary-glow-dim);
+        }
+
+        input[type="radio"] {
+            accent-color: var(--primary-glow);
+            margin-right: 10px;
+            transform: scale(1.2);
+        }
+
+        .select-box {
+            width: 100%;
+            padding: 12px;
+            background: rgba(0,0,0,0.5);
+            color: var(--text-main);
+            border: 1px solid var(--panel-border);
+            border-radius: 6px;
+            font-family: 'Inter', sans-serif;
+            appearance: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .select-box:focus {
+            outline: none;
+            border-color: var(--primary-glow);
+            box-shadow: 0 0 10px var(--primary-glow-dim);
+        }
+
+        .select-box option {
+            background: var(--bg-color);
+            color: var(--text-main);
+        }
+
+        .gap {
+            display: inline-block;
+            background: rgba(0, 229, 255, 0.15);
+            color: var(--primary-glow);
+            padding: 2px 10px;
+            font-family: 'Space Grotesk', sans-serif;
+            border-radius: 4px;
+            margin: 0 5px;
+            border: 1px solid var(--primary-glow-dim);
+        }
+
+        .pool-box {
+            background: rgba(0, 229, 255, 0.05);
+            border: 1px solid var(--primary-glow-dim);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: var(--text-muted);
+        }
+
+        .pool-box strong {
+            color: var(--primary-glow);
+        }
+
+        .audio-placeholder {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 30px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 25px;
+            border: 1px dashed var(--primary-glow);
+            color: var(--primary-glow);
+            font-family: 'Space Grotesk', sans-serif;
+            animation: pulseGlow 2s infinite alternate;
+        }
+
+        .essay-area {
+            width: 100%;
+            height: 450px;
+            background: rgba(0,0,0,0.3);
+            color: var(--text-main);
+            padding: 15px;
+            border: 1px solid var(--panel-border);
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            resize: vertical;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+
+        .essay-area:focus {
+            outline: none;
+            border-color: var(--primary-glow);
+            box-shadow: inset 0 0 10px var(--primary-glow-dim);
+        }
+
+        .global-actions {
+            margin-top: 40px;
+            padding: 30px;
+            text-align: center;
+            background: rgba(255, 0, 85, 0.05);
+            border: 1px solid rgba(255, 0, 85, 0.2);
+            border-radius: 12px;
+        }
+
+        .btn-submit {
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            font-size: 1.2em;
+            padding: 15px 40px;
+        }
+
+        .btn-submit:hover {
+            background: var(--accent-color);
+            color: #fff;
+            box-shadow: 0 0 25px rgba(255, 0, 85, 0.5);
+        }
+
+        .item-feedback {
+            font-weight: 600;
+            margin-top: 10px;
+            display: none;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: 'Space Grotesk', sans-serif;
+            animation: slideUpFade 0.3s ease-out;
+        }
+
+        .correct { 
+            color: var(--success-color); 
+            background: rgba(0, 255, 136, 0.1);
+            text-shadow: 0 0 5px var(--success-color);
+        }
+        .wrong { 
+            color: var(--wrong-color); 
+            background: rgba(255, 51, 102, 0.1);
+            text-shadow: 0 0 5px var(--wrong-color);
+        }
+
+        #total-score-display {
+            margin-top: 20px;
+            font-size: 1.5em;
+            font-family: 'Space Grotesk', sans-serif;
+            color: var(--primary-glow);
+            text-shadow: 0 0 10px var(--primary-glow-dim);
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUpFade {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulseGlow {
+            from { box-shadow: 0 0 5px var(--primary-glow-dim); }
+            to { box-shadow: 0 0 20px var(--primary-glow-dim); }
+        }
+
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>telc B2 // Cyber-Simulation</h1>
+</header>
+
+<div class="container">
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="glass-panel">
+        <h2>System-Login // Kandidatenzugang</h2>
+        <p style="color: var(--text-muted); margin-bottom: 30px;">Bitte initialisieren Sie Ihre Prüfungsdaten, um die Simulation zu starten.</p>
+        <div class="form-group">
+            <input type="text" id="username" placeholder="Name, Vorname eingeben..." required>
+        </div>
+        <button onclick="startSimulation()">Protokoll Starten</button>
+    </div>
+
+    <!-- MAIN INTERFACE -->
+    <div id="main-interface">
+        <div class="user-info glass-panel">
+            <div>Kandidat/-in: <strong id="display-name" style="color: var(--primary-glow);"></strong></div>
+            <div>Modul: <strong>telc B2 Gesamttest</strong></div>
+            <div>Status: <span style="color: var(--success-color);">ONLINE</span></div>
+        </div>
+
+        <!-- Modul-Tabs -->
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab(event, 'lesen1')">Lesen T1</button>
+            <button class="tab-button" onclick="switchTab(event, 'lesen2')">Lesen T2</button>
+            <button class="tab-button" onclick="switchTab(event, 'lesen3')">Lesen T3</button>
+            <button class="tab-button" onclick="switchTab(event, 'bausteine1')">Bausteine T1</button>
+            <button class="tab-button" onclick="switchTab(event, 'bausteine2')">Bausteine T2</button>
+            <button class="tab-button" onclick="switchTab(event, 'hoeren1')">Hören T1</button>
+            <button class="tab-button" onclick="switchTab(event, 'hoeren2')">Hören T2</button>
+            <button class="tab-button" onclick="switchTab(event, 'hoeren3')">Hören T3</button>
+            <button class="tab-button" onclick="switchTab(event, 'schreiben')">Schreiben</button>
+        </div>
+
+        <!-- LESEVERSTEHEN TEIL 1 -->
+        <div id="lesen1" class="tab-content active">
+            <h2>Leseverstehen // Modul 1</h2>
+            <p style="color: var(--text-muted);">Ordnen Sie die Überschriften A–J den Texten 1–5 zu.</p>
+            <div class="module-layout">
+                <div class="text-panel">
+                    <div class="pool-box">
+                        <h4>Datenbank: Überschriften (A–J)</h4>
+                        <strong>A</strong> SÜSSER DIE GLOCKEN NIE KLINGEN — HOCHSAISON IM ERZGEBIRGE<br>
+                        <strong>B</strong> URLAUB AUF DEM FLUSS: BAU DIR DEIN EIGENES FLOSS<br>
+                        <strong>C</strong> REISEABBRUCH DURCH HÖHERE GEWALT — KREUZFAHRTSCHIFF IM SCHLAMM GESTRANDET<br>
+                        <strong>D</strong> MODERNE LOGISTIK: FRAUENREKORD IM HAMBURGER HAFEN<br>
+                        <strong>E</strong> HISTORISCHER SCHIFFBAU: EINE TRADITION STIRBT AUS<br>
+                        <strong>F</strong> LEBEN AUF DEM WASSER — EINE FAMILIE UND IHR ÜBEREINKOMMEN MIT EINEM FRACHTER<br>
+                        <strong>G</strong> DIE BELIEBTESTEN KANUTOUREN AUF DER MECKLENBURGER SEENPLATTE<br>
+                        <strong>H</strong> NATURSCHUTZ UND TOURISMUS IM WIDERSPRUCH AN EUROPÄISCHEN FLÜSSEN<br>
+                        <strong>I</strong> ANSTURM AUF DIE BADESEEN WEGEN ANHALTENDER HITZEWELLE<br>
+                        <strong>J</strong> SURVIVAL-TRAINING: ZURÜCK ZUR NATUR IM SCHWEDISCHEN URWALD
+                    </div>
+                    
+                    <p><strong>Text 1:</strong> Marie steht bis zu den Hüften im tiefblauen, kalten Wasser des Klarälven. Mit fingerdicken, rauen grünen Seilen schnürt sie drei schwere Baumstämme zusammen. Ohne einen einzigen Nagel entsteht hier in mühsamer, stundenlanger Handarbeit ein voll fahrbereites Holzfloß für eine tagelange Reise durch die unberührte Natur Schwedens.</p>
+                    <hr style="border-color: var(--panel-border);">
+                    <p><strong>Text 2:</strong> Es ist kurz nach sechs Uhr morgens im Hamburger Hafen. Während die meisten Menschen noch schlafen, manövriert Marlitt Koop bereits tonnenschwere Frachtcontainer millimetergenau über die Logistikterminals. Die Logistikbranche gilt oft noch als Männerdomäne, doch die junge Fachkraft hat sich hier längst durchgesetzt.</p>
+                    <hr style="border-color: var(--panel-border);">
+                    <p><strong>Text 3:</strong> Die Strömung ist tückisch und wird von Urlaubern oft unterschätzt. Die DLRG warnt in diesem Sommer ausdrücklich davor, ohne professionelle Begleitung oder entsprechende Schutzausrüstung in reißenden Flüssen baden zu gehen. Die Zahl der Rettungseinsätze ist im Vergleich zum Vorjahr drastisch gestiegen.</p>
+                    <hr style="border-color: var(--panel-border);">
+                    <p><strong>Text 4:</strong> Für Familie Meyer war das klassische Einfamilienhaus im Grünen nie eine Option. Vor zwei Jahren kauften sie einen ausgedienten Binnenfrachter und bauten ihn in monatelanger Arbeit zu einem modernen, schwimmenden Wohnsitz mit Küche, Bad und einer großen Sonnenterrasse um.</p>
+                    <hr style="border-color: var(--panel-border);">
+                    <p><strong>Text 5:</strong> Die Windjacken waren schon eingepackt, die Koffer geschlossen. Werner Schneegans (64) und Ingrid Maurer (52) aus Dortmund freuten sich auf ihre Flusskreuzfahrt mit der MS „Eurostar“ von Potsdam nach Prag (2500 Euro). Doch aus der Kreuzfahrt wurde eine Bustour. Schon am zweiten Reisetag wurde das Kreuzfahrtschiff an die Kette gelegt: „Im Hafen von Tangermünde mussten wir raus“, sagt Werner Schneegans. „Unser stolzes Kreuzfahrtschiff hatte zu wenig Wasser unter dem Kiel, konnte nicht weiterfahren!“ Per Bus ging es nach Prag. Busfahrer Werner Schneegans hatte lange für die Kreuzfahrt gespart, will jetzt seine Reisekosten zurück haben. Simone Ortmann (35) von Hapag-Lloyd wehrt ab: „Der Abbruch der Reise war höhere Gewalt.“</p>
+                </div>
+                <div class="task-panel">
+                    <div class="question-block" data-ans="B">
+                        <div class="question-title">Eingabe 01 [Text 1]</div>
+                        <select class="select-box data-input" name="l1_1">
+                            <option value="">-- Auswahl treffen --</option>
+                            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
+                            <option value="F">F</option><option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option>
+                        </select>
+                        <div class="item-feedback"></div>
+                    </div>
+                    <div class="question-block" data-ans="D">
+                        <div class="question-title">Eingabe 02 [Text 2]</div>
+                        <select class="select-box data-input" name="l1_2">
+                            <option value="">-- Auswahl treffen --</option>
+                            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
+                            <option value="F">F</option><option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option>
+                        </select>
+                        <div class="item-feedback"></div>
+                    </div>
+                    <div class="question-block" data-ans="I">
+                        <div class="question-title">Eingabe 03 [Text 3]</div>
+                        <select class="select-box data-input" name="l1_3">
+                            <option value="">-- Auswahl treffen --</option>
+                            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
+                            <option value="F">F</option><option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option>
+                        </select>
+                        <div class="item-feedback"></div>
+                    </div>
+                    <div class="question-block" data-ans="F">
+                        <div class="question-title">Eingabe 04 [Text 4]</div>
+                        <select class="select-box data-input" name="l1_4">
+                            <option value="">-- Auswahl treffen --</option>
+                            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
+                            <option value="F">F</option><option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option>
+                        </select>
+                        <div class="item-feedback"></div>
+                    </div>
+                    <div class="question-block" data-ans="C">
+                        <div class="question-title">Eingabe 05 [Text 5]</div>
+                        <select class="select-box data-input" name="l1_5">
+                            <option value="">-- Auswahl treffen --</option>
+                            <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option>
+                            <option value="F">F</option><option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option>
+                        </select>
+                        <div class="item-feedback"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LESEVERSTEHEN TEIL 2 -->
+        <div id="lesen2" class="tab-content">
+            <h2>Leseverstehen // Modul 2</h2>
+            <div class="module-layout">
+                <div class="text-panel">
+                    <h3 style="color: var(--primary-glow);">Berufliche Orientierung und Praxis im Wandel</h3>
+                    <p>Die Anforderungen an junge Arbeitskräfte auf dem modernen Arbeitsmarkt steigen kontinuierlich. Umso wichtiger wird die frühzeitige Verknüpfung von theoretischer Ausbildung und praktischen Phasen. Viele Auszubildende klagen jedoch darüber, dass betriebliche Realitäten in den Berufsschulen zu selten besprochen werden. Experten fordern daher eine tiefgreifende Reform der Lehrpläne, die flexibler auf technologische Neuerungen und Digitalisierungsprozesse reagieren müssen.</p>
+                    <p>Besonders im handwerklichen und logistischen Sektor zeigt sich eine deutliche Lücke. Während Großkonzerne eigene Schulungszentren unterhalten, fehlt es kleineren Betrieben oft an Zeit und Ressourcen, um den Nachwuchs umfassend einzuarbeiten. Dies führt dazu, dass Auszubildende in kleineren Betrieben häufiger unzufrieden sind und die Ausbildung vorzeitig abbrechen.</p>
+                </div>
+                <div class="task-panel">
+                    <div class="question-block" data-ans="b">
+                        <div class="question-title">Eingabe 06: Experten fordern eine Reform der Lehrpläne, weil...</div>
+                        <div class="options-flex">
+                            <label><input type="radio" class="data-input" name="l2_6" value="a"> a) Auszubildende nicht mehr lernen wollen.</label>
+                            <label><input type="radio" class="data-input" name="l2_6" value="b"> b) Lehrpläne besser auf die Digitalisierung reagieren müssen.</label>
+                            <label><input type="radio" class="data-input" name="l2_6" value="c"> c) die Berufsschulen geschlossen werden sollen.</label>
+                        </div>
+                        <div class="item-feedback"></div>
+                    </div>
+                    <div class="question-block" data-ans="a">
+                        <div class="question-title">Eingabe 07: Kleinere Betriebe haben das Problem, dass...</div>
+                        <div class="options-flex">
+                            <label><input type="radio" class="data-input" name="l2_7" value="a"> a) ihnen oft die Ressourcen für die Einarbeitung fehlen.</label>
+                            <label><input type="radio" class="data-input" name="l2_7" value="b"> b) sie keine Verträge mit Großkonzernen abschließen.</label>
+                            <label><input type="radio" class="data-input" name="l2_7" value="c"> c) Auszubildende dort grundsätzlich mehr Geld verlangen.</label>
+                        </div>
+                        <div class="item-feedback"></div>
+                    </div>
+                    <div class="question-block" data-ans="c">
+                        <div class="question-title">Eingabe 08: Die Unzufriedenheit führt laut Text dazu, dass...</div>
+                        <div class="options-flex">
+                            <label><input type="radio" class="data-input" name="l2_8" value="a"> a) weniger Urlaubstage beantragt werden.</label>
+                            <label><input type="radio" class="data-input" name="l2_8" value="b"> b) Verträge nachträglich verlängert werden.</label>
+                            <label><input type="radio" class="data-input" name="l2_8" value="c"> c) Ausbildungen vorzeitig beendet werden.</label>
+                        </div>
+                        <div class="item-feedback"></div>
+                    </div>
+                    <div class="question-block" data-ans="a">
+                        <div class="question-title">Eingabe 09: Großkonzerne fangen Defizite auf, indem sie...</div>
+                        <div class="options-flex">
+                            <label><input type="radio" class="data-input" name="l2_9" value="a"> a) eigene innerbetriebliche Schulungszentren nutzen.</label>
+                            <label><input type="radio" class="data-input" name="l2_9" value="b"> b) die Arbeitszeiten drastisch verkürzen.</label>
+                            <label><input type="radio" class="data-input" name="l2_9" value="c"> c) nur noch Akademiker einstellen.</label>
+                        </div>
+                        <div class="item-feedback"></div>
+                    </div>
+                    <div class="question-block" data-ans="b">
+                        <div class="question-title">Eingabe 10: Der Text befasst sich im Kern mit...</div>
+                        <div class="options-flex">
+                            <label><input type="radio" class="data-input" name="l2_10" value="a"> a) Der Erhöhung des Mindestlohns im Handwerk.</label>
+                            <label><input type="radio" class="data-input" name="l2_10" value="b"> b) Den aktuellen Herausforderungen der Berufsausbildung.</label>
+                            <label><input type="radio" class="data-input" name="l2_10" value="c"> c) Dem Rückgang des globalen Güterhandels.</label>
+                        </div>
+                        <div class="item-feedback"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- LESEVERSTEHEN TEIL 3 -->
+        <div id="lesen3" class="tab-content">
+            <h2>Leseverstehen // Modul 3</h2>
+            <div class="module-layout">
+                <div class="text-panel">
+                    <div class="pool-box">
+                        <h4>Datenbank: Anzeigenpool (A–M)</h4>
+                        <strong>A:</strong> Sprachkurse B2/C1 Wirtschaftsdeutsch – Intensivtraining für Berufstätige.<br>
+                        <strong>B:</strong> Schiffsreisen und Floßbaukurse im Spreewald – Teambuilding-Angebote für Firmen.<br>
+                        <strong>C:</strong> Ausbildung zum Logistikassistenten im Hamburger Hafengebiet.<br>
+                        <strong>D:</strong> Beratung bei Ausbildungsabbruch und Konflikten im Lehrbetrieb.<br>
+                        <strong>E:</strong> Rechtsschutzversicherung für Berufseinsteiger ab 4,90 € im Monat.<br>
+                        <strong>F:</strong> Mietwohnungen und Hausboote an den norddeutschen Küsten.<br>
+                        <strong>G:</strong> Abenteuerferien und Wildnis-Survivalcamps in Südschweden.<br>
+                        <strong>H:</strong> Seminar: Zeitmanagement und Digitalisierung am Arbeitsplatz.<br>
+                        <strong>I:</strong> DLRG Info-Veranstaltung zur Sicherheit im Wassersport.<br>
+                        <strong>J:</strong> Existenzgründer-Zuschuss: Coaching für junge Unternehmer.<br>
+                        <strong>K:</strong> Handwerkskammer Oldenburg – Fortbildungskurse Schweißtechnik.<br>
+                        <strong>L:</strong> Ausflugsfahrten auf der Elbe – Sonderrabatte für Reisegruppen.<br>
+                        <strong>M:</strong> Karrierebörse Logistik: Treffen Sie die Top-Arbeitgeber online.
+                    </div>
+                </div>
+                <div class="task-panel">
+                    <!-- Tasks 11-20 mapped the same way -->
+                    <script>
+                        const tasks3 = [
+                            {id: 11, ans: "A", q: "Eine Kollegin möchte ihre Fachsprachenkenntnisse im Wirtschaftskontext ausbauen."},
+                            {id: 12, ans: "D", q: "Ein Bekannter hat Probleme im Ausbildungsbetrieb und sucht rechtlichen Rat."},
+                            {id: 13, ans: "G", q: "Ein Student plant eine Rucksacktour und will lernen, in freier Natur zu überleben."},
+                            {id: 14, ans: "B", q: "Eine Firma sucht ein unkonventionelles Outdoor-Event für ein Teambuilding-Wochenende."},
+                            {id: 15, ans: "M", q: "Jemand möchte direkt online mit verschiedenen Personalverantwortlichen aus der Transportbranche sprechen."},
+                            {id: 16, ans: "I", q: "Ein Freizeitsportler möchte sich über Schutzmaßnahmen beim Schwimmen in fließenden Gewässern informieren."},
+                            {id: 17, ans: "X", q: "Ein Rentner sucht einen staatlich geförderten Kurs für Computergrundlagen."},
+                            {id: 18, ans: "F", q: "Eine Familie sucht permanenten Wohnraum direkt am oder auf dem Wasser im Norden."},
+                            {id: 19, ans: "H", q: "Ein Handwerksmeister möchte wissen, wie er digitale Strukturen zeitsparend in den Alltag integriert."},
+                            {id: 20, ans: "C", q: "Jemand sucht eine praxisorientierte Ausbildung im maritimen Hafenumfeld."}
+                        ];
+                        tasks3.forEach(t => {
+                            document.write(`
+                            <div class="question-block" data-ans="${t.ans}">
+                                <div class="question-title">Eingabe ${t.id}</div>
+                                <p style="font-size: 0.9em; margin-top:0;">${t.q}</p>
+                                <select class="select-box data-input" name="l3_${t.id}">
+                                    <option value="">-- Anzeige wählen --</option>
+                                    <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
+                                    <option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option>
+                                    <option value="I">I</option><option value="J">J</option><option value="K">K</option><option value="L">L</option>
+                                    <option value="M">M</option><option value="X">X (Keine passt)</option>
+                                </select>
+                                <div class="item-feedback"></div>
+                            </div>`);
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+
+        <!-- SPRACHBAUSTEINE TEIL 1 -->
+        <div id="bausteine1" class="tab-content">
+            <h2>Sprachbausteine // Modul 1</h2>
+            <div class="module-layout">
+                <div class="text-panel">
+                    <h3 style="color: var(--primary-glow);">Liebe Daniela,</h3>
+                    <p>ich habe schon ein ganz schlechtes Gewissen, denn <span class="gap">21</span> wollte ich dir schon vor zwei Monaten schreiben. Aber du weißt ja, wie das ist: Wenn man sich auf eine Prüfung vorbereitet, hat <span class="gap">22</span> überhaupt keine Zeit mehr für irgendetwas anderes als lernen, lernen, lernen.</p>
+                    <p>Nun habe ich es aber geschafft: Gestern war die Prüfung und ich bin zuversichtlich, dass ich sie bestanden habe. Mein Freund, mit <span class="gap">23</span> Hilfe es mir überhaupt nur möglich war, diese ganze Zeit zu <span class="gap">24</span>, hat mich für heute Abend in ein tolles Restaurant eingeladen. Danach gehen wir auch noch tanzen.</p>
+                    <p>In deinem letzten Brief hast du mich gefragt, <span class="gap">25</span> ich Lust hätte, mit dir zusammen ein Wochenende in London zu verbringen. Natürlich habe ich! <span class="gap">26</span> ich die Prüfung nun hinter mir habe, kann ich mich wieder den angenehmen Dingen des Lebens widmen. Ich schlage vor, dass wir <span class="gap">27</span> am kommenden Wochenende treffen, um Details zu besprechen. Ruf mich doch bitte an, <span class="gap">28</span> du Zeit hast. Ich würde mich freuen, bald von dir zu hören, und verbleibe mit den besten <span class="gap">29</span> an deine Familie. Bis <span class="gap">30</span>!</p>
+                </div>
+                <div class="task-panel">
+                    <script>
+                        const sb1 = [
+                            {id: 21, ans: "a", opts: ["eigentlich", "genau", "gerade"]},
+                            {id: 22, ans: "a", opts: ["man", "jemand", "wer"]},
+                            {id: 23, ans: "c", opts: ["dem", "deren", "dessen"]},
+                            {id: 24, ans: "b", opts: ["überleben", "überstehen", "verbringen"]},
+                            {id: 25, ans: "a", opts: ["ob", "wenn", "dass"]},
+                            {id: 26, ans: "b", opts: ["Weil", "Nachdem", "Da"]},
+                            {id: 27, ans: "c", opts: ["uns", "euch", "wir"]},
+                            {id: 28, ans: "a", opts: ["wann immer", "wohingegen", "solange"]},
+                            {id: 29, ans: "b", opts: ["Grüßen", "Wünschen", "Empfehlungen"]},
+                            {id: 30, ans: "c", opts: ["neulich", "damals", "bald"]}
+                        ];
+                        sb1.forEach(t => {
+                            document.write(`
+                            <div class="question-block" data-ans="${t.ans}">
+                                <div class="question-title">Eingabe ${t.id}</div>
+                                <div class="options-flex">
+                                    <label><input type="radio" class="data-input" name="sb1_${t.id}" value="a"> a) ${t.opts[0]}</label>
+                                    <label><input type="radio" class="data-input" name="sb1_${t.id}" value="b"> b) ${t.opts[1]}</label>
+                                    <label><input type="radio" class="data-input" name="sb1_${t.id}" value="c"> c) ${t.opts[2]}</label>
+                                </div>
+                                <div class="item-feedback"></div>
+                            </div>`);
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+
+        <!-- SPRACHBAUSTEINE TEIL 2 -->
+        <div id="bausteine2" class="tab-content">
+            <h2>Sprachbausteine // Modul 2</h2>
+            <div class="module-layout">
+                <div class="text-panel">
+                    <div class="pool-box">
+                        <h4>Datenbank: Syntax-Pool</h4>
+                        A DESHALB | B DAHER | C SONDERN | D OBWOHL | E DARUM | F ODER | G SOWIE | H JEDOCH | I WÄHREND | J FALLS | K TROTZDEM | L WEGEN | M DAMIT | N ANSTATT | O DENN
+                    </div>
+                    <p>Sehr geehrte Damen und Herren, ich schreibe Ihnen, <span class="gap">31</span> ich mit Ihrem Service bei der letzten Lieferung absolut nicht einverstanden war. Die Ware kam stark verspätet an, <span class="gap">32</span> die Versandbestätigung vorlag. Ich bitte Sie <span class="gap">33</span> um eine Erklärung. <span class="gap">34</span> Sie mir keinen Preisnachlass gewähren, werde ich den Vertrag kündigen, <span class="gap">35</span> ich bin auf verlässliche Partner angewiesen. Ich erwarte Ihre Antwort <span class="gap">36</span> eine Gutschrift bis Ende der Woche. <span class="gap">37</span> des Vorfalls war unser Betrieb blockiert. Es gab keinen Ersatz, <span class="gap">38</span> wir mussten die Produktion stoppen. Wir hoffen auf eine Einigung, <span class="gap">39</span> wir Kundendienst schätzen. Informieren Sie uns, <span class="gap">40</span> es Neuigkeiten gibt.</p>
+                </div>
+                <div class="task-panel">
+                    <script>
+                        const sb2 = [
+                            {id:31, ans:"D", o:["A","B","C","D","E"]},
+                            {id:32, ans:"H", o:["F","G","H","I","J"]},
+                            {id:33, ans:"A", o:["A","B","K","L"]},
+                            {id:34, ans:"J", o:["I","J","M","N"]},
+                            {id:35, ans:"O", o:["C","F","O"]},
+                            {id:36, ans:"G", o:["G","H","M"]},
+                            {id:37, ans:"L", o:["L","N","O"]},
+                            {id:38, ans:"C", o:["A","C","E"]},
+                            {id:39, ans:"M", o:["D","M","O"]},
+                            {id:40, ans:"J", o:["F","J","K"]}
+                        ];
+                        sb2.forEach(t => {
+                            let optionsHTML = t.o.map(opt => `<option value="${opt}">${opt}</option>`).join("");
+                            document.write(`
+                            <div class="question-block" data-ans="${t.ans}">
+                                <div class="question-title">Eingabe ${t.id}</div>
+                                <select class="select-box data-input" name="sb2_${t.id}">
+                                    <option value="">-- wählen --</option>
+                                    ${optionsHTML}
+                                </select>
+                                <div class="item-feedback"></div>
+                            </div>`);
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+
+        <!-- HÖRVERSTEHEN (1, 2, 3) -->
+        <script>
+            function renderAudioSection(id, title, audioText, tasks) {
+                document.write(`
+                <div id="${id}" class="tab-content">
+                    <h2>${title}</h2>
+                    <div class="audio-placeholder">
+                        <span style="font-size: 1.5em; vertical-align: middle;">🔊</span> 
+                        <strong>Audio-Kanal synchronisiert [${audioText}]</strong>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
+                `);
+                
+                tasks.forEach(t => {
+                    let inputHtml = "";
+                    if(t.type === "rf") {
+                        inputHtml = `
+                        <label><input type="radio" class="data-input" name="${id}_${t.id}" value="r"> Richtig</label>
+                        <label><input type="radio" class="data-input" name="${id}_${t.id}" value="f"> Falsch</label>`;
+                    } else if (t.type === "abc") {
+                        inputHtml = `
+                        <label><input type="radio" class="data-input" name="${id}_${t.id}" value="a"> a) ${t.opts[0]}</label>
+                        <label><input type="radio" class="data-input" name="${id}_${t.id}" value="b"> b) ${t.opts[1]}</label>
+                        <label><input type="radio" class="data-input" name="${id}_${t.id}" value="c"> c) ${t.opts[2]}</label>`;
+                    }
+                    
+                    document.write(`
+                    <div class="question-block" data-ans="${t.ans}">
+                        <div class="question-title">Eingabe ${t.id}</div>
+                        <p style="font-size: 0.9em; margin-top:0;">${t.q}</p>
+                        <div class="options-flex">
+                            ${inputHtml}
+                        </div>
+                        <div class="item-feedback"></div>
+                    </div>`);
+                });
+                document.write(`</div></div>`);
+            }
+
+            renderAudioSection("hoeren1", "Hörverstehen // Modul 1 (Global)", "Stream 1-5 Aktiv", [
+                {id: 41, ans: "r", type: "rf", q: "Der Sprecher empfiehlt Reisenden, alternative Fahrtrouten zu wählen."},
+                {id: 42, ans: "f", type: "rf", q: "Aufgrund von Unwettern fällt der gesamte Regionalverkehr im Norden aus."},
+                {id: 43, ans: "r", type: "rf", q: "Am Wochenende kommt es auf den Autobahnen wegen Baustellen zu Verzögerungen."},
+                {id: 44, ans: "f", type: "rf", q: "Der Fährbetrieb nach Schweden wurde komplett eingestellt."},
+                {id: 45, ans: "r", type: "rf", q: "In den Bergen wird vor plötzlichem Steinschlag gewarnt."}
+            ]);
+
+            renderAudioSection("hoeren2", "Hörverstehen // Modul 2 (Detail)", "Interview-Stream", [
+                {id: 46, ans: "c", type: "abc", q: "Die Gesprächspartnerin vertritt die Ansicht, dass Fremdsprachenkompetenzen...", opts: ["beruflich unwichtig geworden sind.", "nur noch über Online-Apps vermittelt werden sollten.", "die Qualifikation auf dem Arbeitsmarkt massiv stärken."]},
+                {id: 47, ans: "b", type: "abc", q: "Ein Auslandsaufenthalt während der Schulzeit ist laut Sprecherin...", opts: ["reine Zeitverschwendung.", "eine hervorragende Möglichkeit zur Persönlichkeitsentwicklung.", "finanziell für niemanden mehr tragbar."]},
+                {id: 48, ans: "a", type: "abc", q: "Viele Unternehmen klagen darüber, dass Bewerber...", opts: ["zu geringe praktische Erfahrungen vorweisen können.", "unrealistische Gehaltsforderungen stellen.", "keine Fremdsprachen mehr lernen wollen."]},
+                {id: 49, ans: "c", type: "abc", q: "Digitale Lernformen bieten den Vorteil,...", opts: ["dass Lehrer überflüssig werden.", "dass keine Prüfungen mehr abgelegt werden müssen.", "zeitlich und örtlich flexibel lernen zu können."]},
+                {id: 50, ans: "a", type: "abc", q: "Zum Abschluss rät die Expertin jungen Menschen,...", opts: ["Mut zu haben und neue Wege auszuprobieren.", "sich sofort im ersten Betrieb fest anzustellen.", "ein langes Studium zu forcieren."]}
+            ]);
+
+            renderAudioSection("hoeren3", "Hörverstehen // Modul 3 (Selektiv)", "Statements-Stream", [
+                {id: 51, ans: "f", type: "rf", q: "Der Redner sieht in flexiblen Arbeitszeitmodellen gravierende Nachteile für Arbeitnehmer."},
+                {id: 52, ans: "r", type: "rf", q: "Die neue Home-Office-Regelung hat im vergangenen Jahr zu einer Steigerung der Produktivität geführt."},
+                {id: 53, ans: "r", type: "rf", q: "Für viele Angestellte ist es im Home-Office schwieriger, die Grenzen zwischen Beruf und Privatleben zu ziehen."},
+                {id: 54, ans: "f", type: "rf", q: "Das Unternehmen plant, die physischen Büroflächen im nächsten Jahr komplett aufzugeben."},
+                {id: 55, ans: "f", type: "rf", q: "Mitarbeiter können ihre Arbeitszeiten in Zukunft völlig frei ohne jegliche Kernzeiten einteilen."}
+            ]);
+        </script>
+
+        <!-- SCHRIFTLICHER AUSDRUCK -->
+        <div id="schreiben" class="tab-content">
+            <h2>Schriftlicher Ausdruck // B2</h2>
+            <div class="module-layout">
+                <div class="text-panel">
+                    <h3 style="color: var(--primary-glow);">Option 1: Fehlerhafter Online-Sprachkurs</h3>
+                    <p>Sie haben an einem kostenpflichtigen Online-Intensivkurs teilgenommen. Entgegen der Werbeversprechen gab es massive technische Probleme und die Gruppen waren überfüllt. Schreiben Sie eine Beschwerde (mindestens 150 Wörter).</p>
+                </div>
+                <div class="task-panel">
+                    <textarea class="essay-area" placeholder="Initialisieren Sie hier Ihren Text-Input..."></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- AUSWERTUNGSMODUL -->
+        <div class="global-actions">
+            <button type="button" class="btn-submit" onclick="evaluateEntireExam()">
+                [ DATENSATZ AUSWERTEN ]
+            </button>
+            <div id="total-score-display"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function startSimulation() {
+        const inputName = document.getElementById('username').value.trim();
+        if (!inputName) {
+            alert("Fehler: Kandidatenname erforderlich.");
+            return;
+        }
+        document.getElementById('display-name').textContent = inputName;
+        document.getElementById('login-screen').style.display = 'none';
+        
+        const main = document.getElementById('main-interface');
+        main.style.display = 'block';
+    }
+
+    function switchTab(event, tabId) {
+        const contents = document.querySelectorAll('.tab-content');
+        contents.forEach(c => {
+            c.classList.remove('active');
+            c.style.animation = 'none'; // reset animation
+        });
+
+        const tabs = document.querySelectorAll('.tab-button');
+        tabs.forEach(t => t.classList.remove('active'));
+
+        const target = document.getElementById(tabId);
+        target.classList.add('active');
+        
+        // Trigger reflow to restart animation
+        void target.offsetWidth; 
+        target.style.animation = 'slideUpFade 0.4s ease-out';
+
+        event.currentTarget.classList.add('active');
+    }
+
+    function evaluateEntireExam() {
+        const blocks = document.querySelectorAll('.question-block');
+        const submitBtn = document.querySelector('.btn-submit');
+        
+        submitBtn.textContent = "[ ANALYSIERE... ]";
+        submitBtn.style.opacity = "0.7";
+        submitBtn.style.pointerEvents = "none";
+
+        // Simulate processing delay for futuristic feel
+        setTimeout(() => {
+            let points = 0;
+            let totalEvaluated = blocks.length;
+
+            blocks.forEach(block => {
+                const correctAnswer = block.getAttribute('data-ans');
+                const feedbackField = block.querySelector('.item-feedback');
+                let selectedValue = "";
+
+                const radioChecked = block.querySelector('input[type="radio"]:checked');
+                const selectElement = block.querySelector('select');
+
+                if (radioChecked) selectedValue = radioChecked.value;
+                else if (selectElement) selectedValue = selectElement.value;
+
+                if (feedbackField) {
+                    feedbackField.style.display = "block";
+                    if (selectedValue.toLowerCase() === correctAnswer.toLowerCase()) {
+                        feedbackField.innerHTML = `[ ✓ VERIFIZIERT ]`;
+                        feedbackField.className = "item-feedback correct";
+                        points++;
+                    } else {
+                        feedbackField.innerHTML = `[ ✗ FEHLER ] Korrekt: ${correctAnswer.toUpperCase()}`;
+                        feedbackField.className = "item-feedback wrong";
+                    }
+                }
+            });
+
+            const scoreWidget = document.getElementById('total-score-display');
+            scoreWidget.innerHTML = `SYSTEM-ANALYSE ABGESCHLOSSEN<br>TREFFERQUOTE: ${points} / ${totalEvaluated}`;
+            scoreWidget.style.opacity = 1;
+            scoreWidget.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            
+            submitBtn.textContent = "[ DATENSATZ AUSWERTEN ]";
+            submitBtn.style.opacity = "1";
+            submitBtn.style.pointerEvents = "auto";
+        }, 800);
+    }
+</script>
+</body>
+</html>
